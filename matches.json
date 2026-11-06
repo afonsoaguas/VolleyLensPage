@@ -10,5 +10,15 @@
         }
       ]
     }
+    {
+      "id": "gdscascais-famoesc
+      "scout": "scouts/GDSCascais-FamoesC.dvw",
+      "videos": [
+        {
+          "id": "eawY1ozxr5M",
+          "offsetSeconds": 0
+        }
+      ]
+    }
   ]
 }
