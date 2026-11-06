@@ -51,9 +51,30 @@ Example:
 
 The `videos` array follows the scout's video references: its first entry maps to DVW video 1, second entry to DVW video 2, and so on.
 Use `"videos": []` for a statistics-only match.
-There is no background synchronization: manually replace a scout and rerun the publishing command when needed.
 Only generated statistics, necessary roster information and action timing are deployed to Pages; the original scouting files remain in the source repository.
 All repository and published information should be treated as public when using a public repository/site.
+
+## Automatic import from DV4
+
+`watch_scouts.py` watches `C:\Data Project\Data Volley 4\Seasons\GDSC26 27\Scout` (it waits if the folder does not exist yet). For every **new** `.dvw` it:
+
+1. Waits until DV4 has not saved the file for 10 minutes (DV4 keeps saving while you scout).
+2. Rejects unreadable/encoded files without changing anything.
+3. Copies it to `scouts/<id>.dvw` (id from the file name, e.g. `&XXX01 GDSCascais vs Gipa.dvw` → `xxx01-gdscascais-vs-gipa`).
+4. Adds a `matches.json` entry with the placeholder YouTube id `TEMP_YOUTUBE_ID`, runs `publish.py`, then commits only `matches.json`, `scouts` and `docs/data` and pushes to GitHub.
+
+A match with `TEMP_YOUTUBE_ID` is published with statistics and a "YouTube video pending" label. Once the video is uploaded, replace `TEMP_YOUTUBE_ID` with the real 11-character id (and offset if needed), run `python publish.py`, then commit and push.
+If DV4 saves the source file again later, the scout copy is refreshed and your YouTube id is kept. Files that were already in the folder when the watcher first ran are ignored (use `--import-existing` on the first run to include them).
+If you have uncommitted edits in `matches.json`, `scouts` or `docs/data`, the import happens locally only and you commit it yourself. A failed push (offline) is retried every 5 minutes.
+
+Start automatically at Windows logon (no administrator rights needed), or remove it:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install_watcher.ps1
+powershell -ExecutionPolicy Bypass -File .\install_watcher.ps1 -Uninstall
+```
+
+Run manually with `python watch_scouts.py` (options: `--once`, `--no-push`, `--no-git`, `--quiet-minutes 10`, `--source <folder>`). Activity is logged to `.automation\watcher.log`.
 
 ## Timestamp alignment
 

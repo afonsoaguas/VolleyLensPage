@@ -34,7 +34,7 @@ function renderLibrary() {
     const teams = node("div", undefined, "teams");
     teams.append(node("h3", item.home), node("div", item.score || "-", "score"), node("h3", item.away));
     const badges = node("div", undefined, "badges");
-    badges.append(node("span", "Published scouting", "badge"), node("span", `${item.videos.length} YouTube video(s)`, "badge"));
+    badges.append(node("span", "Published scouting", "badge"), node("span", item.videoPending ? "YouTube video pending" : `${item.videos.length} YouTube video(s)`, "badge"));
     const open = node("button", "Statistics & video");
     open.type = "button";
     open.addEventListener("click", () => { void openMatch(item); });

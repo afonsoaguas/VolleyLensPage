@@ -11,14 +11,18 @@ from scout_stats import ScoutError, display_text, statistics
 
 ROOT = Path(__file__).resolve().parent
 MAX_SCOUT = 5 * 1024 * 1024
+PENDING_VIDEO_ID = "TEMP_YOUTUBE_ID"
 
 
 def read_scout(path):
-    blob = path.read_bytes()
+    return decode_scout(path.read_bytes(), path.name)
+
+
+def decode_scout(blob, name):
     if not blob or len(blob) > MAX_SCOUT:
-        raise ValueError(f"{path.name}: scout must be nonempty and no larger than 5 MB.")
+        raise ValueError(f"{name}: scout must be nonempty and no larger than 5 MB.")
     if not blob.startswith((b"[3DATAVOLLEYSCOUT]", b"\xef\xbb\xbf[3DATAVOLLEYSCOUT]")):
-        raise ValueError(f"{path.name}: use a readable DV4 export, not an encoded Player download.")
+        raise ValueError(f"{name}: use a readable DV4 export, not an encoded Player download.")
     try:
         return blob.decode("utf-8-sig")
     except UnicodeDecodeError:
@@ -29,6 +33,12 @@ def video_config(value):
     if not isinstance(value, list):
         raise ValueError("Each match needs a videos array (it may be empty).")
     videos = []
+    pending = [isinstance(entry, dict) and entry.get("id") == PENDING_VIDEO_ID for entry in value]
+    if any(pending):
+        # Video indexes come from the scout, so a partly-pending list would shift clips to the wrong video.
+        if not all(pending):
+            raise ValueError(f"Replace every {PENDING_VIDEO_ID} in a match before publishing its other videos.")
+        return []
     for entry in value:
         if not isinstance(entry, dict) or not re.fullmatch(r"[A-Za-z0-9_-]{11}", str(entry.get("id", ""))):
             raise ValueError("Each video needs an 11-character YouTube id, not a full URL.")
@@ -80,6 +90,7 @@ def build(root=ROOT):
         data = statistics(text)
         data.pop("retrievedAt", None)
         videos = video_config(entry.get("videos"))
+        video_pending = any(isinstance(video, dict) and video.get("id") == PENDING_VIDEO_ID for video in entry["videos"])
         date, competition = metadata(text)
         scores = data["scores"]
         home, away = data["all"]["teams"]
@@ -89,6 +100,8 @@ def build(root=ROOT):
             "score": f"{sum(s['home'] > s['away'] for s in scores)} - {sum(s['away'] > s['home'] for s in scores)}" if scores else "",
             "videos": videos, "data": f"data/{identifier}.json",
         }
+        if video_pending:
+            item["videoPending"] = True
         data["match"] = item
         library.append(item)
         outputs[f"{identifier}.json"] = data

@@ -67,7 +67,9 @@ function youtubePlayback(item) {
   mount.hidden = true;
   const message = node("p", item.videos.length
     ? "Load YouTube to watch the match, or click a statistic to start an action playlist."
-    : "No YouTube video is configured for this match. Statistics are still available.", "muted");
+    : item.videoPending
+      ? "The YouTube video for this match has not been published yet. Statistics are already available."
+      : "No YouTube video is configured for this match. Statistics are still available.", "muted");
   message.setAttribute("role", "status");
   message.setAttribute("aria-live", "polite");
   const external = node("a", "Open selected video on YouTube", "external-video");
