@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>VolleyLens | Match library</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="./youtube.js" defer></script>
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="eyebrow">VOLLEYBALL / PUBLISHED MATCH LIBRARY</div>
+      <h1>VolleyLens.</h1>
+      <p class="intro">Explore the numbers. Replay the actions. Published scouting statistics and YouTube match video, with no DV4 connection needed.</p>
+      <span class="badge connected">Static edition / YouTube</span>
+    </header>
+    <p id="status" role="status" aria-live="polite">Loading match library...</p>
+    <section id="library">
+      <div class="toolbar">
+        <h2>Matches</h2>
+        <label class="search-label" for="search">Search archive<input id="search" type="search" placeholder="Team, competition, date..." autocomplete="off"></label>
+      </div>
+      <p id="result-count"></p>
+      <div id="cards" class="cards"></div>
+    </section>
+    <section id="match" hidden aria-labelledby="match-title">
+      <button id="back-library" type="button" class="secondary">Back to matches</button>
+      <h2 id="match-title"></h2>
+      <p id="match-info" class="muted"></p>
+      <div id="match-content"></div>
+    </section>
+    <aside><strong>Published scouting + YouTube.</strong> Statistics use readable DV4 exports. Action clips follow the scout's original video timestamps, plus any configured YouTube offset. Six-second playback is approximate: YouTube ads, seek precision, buffering and browser autoplay restrictions can interrupt clips. No separate clip files are created. Click Load YouTube or a statistic to contact YouTube; its player may use cookies. This is an independent project, not affiliated with Data Project or YouTube.</aside>
+  </main>
+</body>
+</html>
